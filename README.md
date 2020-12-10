@@ -1,16 +1,17 @@
 # AM Dockerfile
 
 
-This is designed to be a flexible AM image that can be used in
-different deployment styles.
+This is designed to be a simple AM image for testing.
 
 If you have an existing configuration store, you can configure AM to use it by creating
 an appropriate boot.json file with boot passwords stored in keystore.jceks.
 
+It includes a local Amster install for installing and configuring AM.
+
 
 # Building
 
-* The Dockerfile assumes that the openam.war file is pre-downloaded in this directory.
+* The Dockerfile assumes that the openam.war and Amster.zip file is pre-downloaded in this directory.
 
 ``` 
 $ docker build -t am-eval . 
