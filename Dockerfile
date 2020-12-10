@@ -59,6 +59,9 @@ RUN apk add --no-cache su-exec unzip curl bash  \
   && chmod -R g=u "$CATALINA_HOME" \
   && chmod -R g=u "$FORGEROCK_HOME"
 
+COPY Amster.zip /tmp/Amster.zip
+RUN mkdir -p "$FORGEROCK_HOME"/amster
+RUN unzip -q /tmp/Amster.zip -d "$FORGEROCK_HOME"/amster
 
 # If you want to create an image that is ready to be bootstrapped to a
 # configuration store, you can add a custom boot.json file.
