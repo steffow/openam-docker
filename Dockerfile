@@ -43,16 +43,17 @@ ENV UMASK="0002"
 COPY openam.war  /tmp/openam.war
 
 RUN apt update \
-  && apt install -y unzip curl bash  \
+  && apt install -y sudo unzip curl bash  \
   && rm -fr /usr/local/tomcat/webapps/* \
   && unzip -q /tmp/openam.war -d "$CATALINA_HOME"/webapps/openam \
   #  Let's use bootstrap.properties rather than default location
   && echo "configuration.dir="$OPENAM_CONFIG_DIR"" >> "$CATALINA_HOME"/webapps/openam/WEB-INF/classes/bootstrap.properties \
   && rm /tmp/openam.war \
-  # Add 'forgerock' to primary group 'root'. OpenShift's dynamic user also has 'root' as primary group.
+  # Add 'forgerock' to primary group 'root' and 'sudo'. OpenShift's dynamic user also has 'root' as primary group.
   # By this the dynamic user has almost the same privs a 'forgerock'
   && adduser --shell /bin/bash --home "$FORGEROCK_HOME" --uid 11111 forgerock \
-  && usermod -a -G root forgerock \
+  && usermod -a -G root,sudo forgerock \
+  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
   && mkdir -p "$OPENAM_CONFIG_DIR" \
   && chown -R forgerock:root "$CATALINA_HOME" \
   && chown -R forgerock:root  "$FORGEROCK_HOME" \
