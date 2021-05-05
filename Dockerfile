@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 #
-FROM tomcat:8.5.24-jre8-alpine
+FROM tomcat:jdk11-adoptopenjdk-openj9
 
 
 # Example
@@ -42,15 +42,17 @@ ENV UMASK="0002"
 
 COPY openam.war  /tmp/openam.war
 
-RUN apk add --no-cache su-exec unzip curl bash  \
+RUN apt update \
+  && apt install -y unzip curl bash  \
   && rm -fr /usr/local/tomcat/webapps/* \
-  && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
+  && unzip -q /tmp/openam.war -d "$CATALINA_HOME"/webapps/openam \
   #  Let's use bootstrap.properties rather than default location
   && echo "configuration.dir="$OPENAM_CONFIG_DIR"" >> "$CATALINA_HOME"/webapps/openam/WEB-INF/classes/bootstrap.properties \
   && rm /tmp/openam.war \
   # Add 'forgerock' to primary group 'root'. OpenShift's dynamic user also has 'root' as primary group.
   # By this the dynamic user has almost the same privs a 'forgerock'
-  && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -G root -D forgerock \
+  && adduser --shell /bin/bash --home "$FORGEROCK_HOME" --uid 11111 forgerock \
+  && usermod -a -G root forgerock \
   && mkdir -p "$OPENAM_CONFIG_DIR" \
   && chown -R forgerock:root "$CATALINA_HOME" \
   && chown -R forgerock:root  "$FORGEROCK_HOME" \
